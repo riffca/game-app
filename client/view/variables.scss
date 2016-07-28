@@ -1,0 +1,30 @@
+/*
+/*background
+*/
+
+$application-bg: lighten(grey, 45%);
+$brand-bg: #282846;
+
+/*
+/*mixins
+*/
+
+@mixin center-page-container($percent) {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+	margin: 0 auto;
+    width:$percent;
+}
+
+@mixin responsiveWidth($maxWidth) {
+    max-width: $maxWidth;
+    width: 100%;
+    height: auto;
+}
+
+@mixin responsiveHeight($maxHeight) {
+    max-height: $maxHeight;
+    width: auto !important;
+    height: 100%;
+}

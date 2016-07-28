@@ -1,0 +1,29 @@
+@import 'view/variables'; 
+
+* {
+	padding:0;
+	margin: 0;
+	box-sizing:border-box;
+}
+
+html, body {
+	height:100%;
+}
+ul{
+	text-decoration: none;
+	list-style: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+#application {
+	height:100%;
+  	position: relative;
+  	background: $application-bg;
+	h1,h2 {
+		padding: 15px;
+		text-align: center;
+	}
+}

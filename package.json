@@ -1,0 +1,63 @@
+{
+  "name": "web-app",
+  "version": "0.0.1",
+  "description": "app",
+  "main": "webpack.config.js",
+  "jshintConfig": {
+    "strict": false,
+    "esversion": 6,
+    "node": "none"
+  },
+  "scripts": {
+    "push": "git push -u origin master",
+    "debug": "SET DEBUG=http && nodemon server/server.js",
+    "start": "nodemon server/server.js",
+    "test": "webpack-dev-server --inline --hot",
+    "history": "webpack-dev-server --inline --hot --history-api-fallback",
+    "build": "SET NODE_ENV=production && webpack"
+  },
+  "keywords": [],
+  "author": "riffca",
+  "license": "",
+  "devDependencies": {
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-runtime": "^6.9.0",
+    "babel-preset-es2015": "^6.6.0",
+    "babel-runtime": "^6.9.2",
+    "browser-sync": "^2.12.8",
+    "browser-sync-webpack-plugin": "^1.0.1",
+    "css-loader": "^0.23.1",
+    "exports-loader": "^0.6.3",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "imports-loader": "^0.6.5",
+    "node-sass": "^3.7.0",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^3.2.0",
+    "style-loader": "^0.13.1",
+    "vue-async-data": "^1.0.2",
+    "vue-hot-reload-api": "^1.3.2",
+    "vue-html-loader": "^1.2.2",
+    "vue-loader": "^8.5.2",
+    "vue-moment": "^2.0.1",
+    "vue-resource": "^0.7.4",
+    "vue-style-loader": "^1.0.0",
+    "webpack": "^1.13.0"
+  },
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.15.2",
+    "debug": "^2.2.0",
+    "express": "^4.13.4",
+    "express-interceptor": "^1.2.0",
+    "jsonwebtoken": "^7.0.1",
+    "mongoose": "^4.5.0",
+    "mongoose-unique-validator": "^1.0.2",
+    "morgan": "^1.7.0",
+    "multer": "^1.1.0",
+    "node-uuid": "^1.4.7",
+    "vue": "^1.0.24",
+    "vue-resource": "^0.7.4",
+    "vue-router": "^0.7.13"
+  }
+}
