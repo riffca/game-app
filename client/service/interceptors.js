@@ -1,14 +1,9 @@
-import token from './token';
-
 export default function() {
     let timeId = setInterval(() => {
         logger('(http)Loading..');
     }, 10);
     return {
         request: (request) => {
-            request.headers = {
-                'x-access-token': token.getToken() || ''
-            };
             logger(`Http ${request.method} request to ${request.url}`, () => {
                 let data = request.data;
                 if (data) {

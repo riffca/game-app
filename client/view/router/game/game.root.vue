@@ -17,7 +17,12 @@ export default {
 <style lang="sass">
 @import '../../variables';
 #game-root {
-	@include center-page-container(70%);
-
+	height: inherit;
+	@include center-page-container(90%);
+	padding-top:8%;
+	@media screen and(max-width: 700px){
+		padding-top:20%;
+		width: 100%;
+	}
 }
 </style>

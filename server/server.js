@@ -1,90 +1,113 @@
 "use strict";
+//config
+let config = require('./config');
+//needs
 let express = require('express');
-
-//
-//D A T A B A S E
-//
-/*let mongoose = require('mongoose');
-
-function timeStampsPlugin(schema, options) {
-    schema.add({
-        createdAt: {
-            type: Date,
-            default: Date.now()
-        },
-        updatedAt: {
-            type: Date,
-            default: Date.now()
-        },
-    });
-    schema.pre('save', function(next) {
-        this.upadtedAt = Date.now();
-        next();
+let app = express();
+let http = require('http').Server(app);
+let io = require('socket.io')(http);
+//let uuid = require('node-uuid');
+/**
+/*
+/*Socket Config
+/*
+*/
+io.on('connection', socket => {
+    //connection
+    console.log('user with id "' + socket.id + '" connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
     });
 
-    if (options && options.index) {
-        schema.path('upadatedAt').index(options.index);
-    }
-}
-mongoose.Promise = global.Promise;
-mongoose.plugin(timeStampsPlugin);
-mongoose.connect('localhost:27017', err => {
-    if (err) {
-        console.log(err);
-        return;
-    }
-    console.log('Database connected');
-});*/
+    //create room
+    socket.on('create room', room => {
+        socket.join(room);
+        io.to(room).emit('create room', 'game created');
+    });
 
-//
-//E X P R E S S 
-//
-let app = new express();
+    //chat messages
+    socket.on('write message', data => {
+        io.to(data.room).emit('get message', {
+            msg: data.message,
+            username: data.username
+        });
+    });
 
+    //game actions
+    socket.on('game action', data => {
+        io.to(data.room).emit('action done', {
+            action: data.action,
+            index: data.index,
+            parentIndex: data.parentIndex
+        });
+    });
+});
+
+/**
+/*
+/*Server config
+/*
+*/
 //P A R S E  B O D Y
 let bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }))
     .use(bodyParser.json());
 
 //L O G G I N G
-//http://stackoverflow.com/questions/23494956/how-to-use-morgan-logger
-
 let debug = require('debug')('http');
-
 let interceptor = require('express-interceptor');
 let finalInterceptor = interceptor((req, res) => {
     return {
         isInterceptable() {
             debug(req.method + ' ' + req.url);
-            debug({data: req.body});
+            debug({ data: req.body });
         },
         intercept(body, send) {}
     };
 });
 app.use(finalInterceptor);
 
-//S T A T I C
+//S T A T I C S 
 app.use(express.static(__dirname + '/public'));
-//A P I
 
-/*
-let userApi = require('./model/user.api')(express);
-app.use('/api/user', userApi);
-let postApi = require('./model/post')(express);
-app.use('/api/post',postApi);
-let messageApi = require('./model/message')(express);
-app.use('/api/message', messageApi);
-let projectApi = require('./model/project')(express);
-app.use('/api/project', projectApi);
-*/
+// W E B P A C K
+if (process.env.NODE_ENV === config.NODE_ENV) {
+    const webpack = require('webpack');
+    const webpackConfig = require('../webpack.config');
+    const compiler = webpack(webpackConfig);
 
+    app.use(require('webpack-dev-middleware')(compiler, {
+        noInfo: true,
+        publicPath: webpackConfig.output.publicPath,
+    }));
+    app.use(require('webpack-hot-middleware')(compiler));
+}
 
+//A P P  A P I
+app.post('/api/game/create', (req, res) => {
+    res.send('ок');
+});
+
+app.get('/api/game/get-rooms',(req,res)=>{
+    let rooms = io.sockets.adapter.rooms;
+    console.log(rooms);
+    res.send('rooms');
+});
+
+app.post('/api/game/join', (req, res) => {
+    res.send('ок');
+});
+app.post('/api/game/play', (req, res) => {
+    res.send('ок');
+});
+
+//I N D E X . H T M L
 app.get('*', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-let config = require('./config');
+//S T A R T  S E R V E R
 
-app.listen(config.port, () => {
+http.listen(config.port, () => {
     console.log('Server started at port ' + config.port);
 });

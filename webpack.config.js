@@ -30,14 +30,15 @@ module.exports = {
         modulesDirectories: ['node_modules'],
         alias: {
             'class': path.join(frontend, 'class'),
-            'help': path.join(frontend,'help'),
-            'service': path.join(frontend,'service'),
-            'router':path.join(frontend, 'view', 'router'),
-            'view': path.join(frontend,'view'),
-            'root': path.join(frontend,'view','root'),
-            'profile-route':path.join(frontend,'view','router','profile'),
-            'auth-route':path.join(frontend,'view','router', 'auth'),
-            'parts':path.join(frontend,'view','parts')
+            'help': path.join(frontend, 'help'),
+            'service': path.join(frontend, 'service'),
+            'router': path.join(frontend, 'view', 'router'),
+            'view': path.join(frontend, 'view'),
+            'root': path.join(frontend, 'view', 'root'),
+            'profile-route': path.join(frontend, 'view', 'router', 'profile'),
+            'auth-route': path.join(frontend, 'view', 'router', 'auth'),
+            'parts': path.join(frontend, 'view', 'parts'),
+            'socket.io-client': path.join(__dirname, 'node_modules', 'socket.io', 'node_modules', 'socket.io-client', 'socket.io.js')
         },
         extensions: ['', '.js', '.scss', '.css', '.html', '.vue'],
 
@@ -72,6 +73,9 @@ module.exports = {
     },
 
     plugins: [
+        //new webpack.optimize.OccurenceOrderPlugin(),
+        //new webpack.HotModuleReplacementPlugin(),
+        //new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV),
             USER: JSON.stringify({

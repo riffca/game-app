@@ -1,3 +1,5 @@
+//debug socket.io
+localStorage.debug = 'socket.io-client:socket';
 /**
 /*
 /*Style defaults
@@ -37,5 +39,5 @@ import routeMap from 'view/router';
 router
     .map(routeMap)
     .start(rootComponent, '#application', () => {
-        console.log('Routing active');
+        logger('Client Routing active');
     });

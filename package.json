@@ -9,6 +9,7 @@
     "node": "none"
   },
   "scripts": {
+    "iodebug": "SET DEBUG=socket.io:socket && nodemon server/server.js",
     "push": "git push -u origin master",
     "debug": "SET DEBUG=http && nodemon server/server.js",
     "start": "nodemon server/server.js",
@@ -42,7 +43,9 @@
     "vue-moment": "^2.0.1",
     "vue-resource": "^0.7.4",
     "vue-style-loader": "^1.0.0",
-    "webpack": "^1.13.0"
+    "webpack": "^1.13.0",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.12.2"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -56,6 +59,7 @@
     "morgan": "^1.7.0",
     "multer": "^1.1.0",
     "node-uuid": "^1.4.7",
+    "socket.io": "^1.4.8",
     "vue": "^1.0.24",
     "vue-resource": "^0.7.4",
     "vue-router": "^0.7.13"

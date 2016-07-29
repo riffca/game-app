@@ -1,6 +1,6 @@
 <template>
 <div id="brand-root">
-	<a v-link="{name: 'index'}" class="brand-logo">Play Game</a>
+	<a v-link="{name: 'index'}" class="brand-logo">Tic Tac Toe Game</a>
 </div>
 </template>
 
@@ -21,6 +21,7 @@ export default {
 	padding:20px;
 	max-height: 100px;
 	border-bottom: 1px solid grey;
+	z-index: 9999;
 	.brand-logo {
 		margin-left: 20%;
 		font-size: 1.4rem;
