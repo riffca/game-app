@@ -1,12 +1,12 @@
 <template>
+  {{$data | json}}
 	<brand-root></brand-root>
   <router-view></router-view>
 </template>
 
 <script>
-
-//html
 import socketService from 'service/socket';
+//html
 import BrandRoot from './brand-root';
 
 export default {

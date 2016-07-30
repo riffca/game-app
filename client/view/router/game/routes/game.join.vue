@@ -24,8 +24,8 @@
 </div>
 </template>
 <script>
+import socketService from 'service/socket';
 import formWrapper from 'parts/form-wrapper';
-
 export default {
   components: {formWrapper},
   data () {
@@ -61,6 +61,7 @@ export default {
   			this.$route.router.go({
   				name: 'gamePlay',
   				query:{
+  					status: 'visitor',
   					gamename: this.$route.gamename
   				}
   			}); 		

@@ -47,6 +47,10 @@ module.exports = {
     devtool: NODE_ENV === 'development' ?
         'inline-cheap-module-source-map' : null,
     module: {
+        //fix pre build issue with sicket io
+        noParse: [
+            /socket.io/
+        ],
         loaders: [{
             test: /\.js$/,
             loader: 'babel?presets[]=es2015',
@@ -54,9 +58,7 @@ module.exports = {
         }, {
             test: /\.scss$/,
             loader: NODE_ENV === 'development' ?
-                'style!css!sass?sourceMap' : ExtractTextPlugin.extract(
-                    'css!autoprefixer?browsers=last 2 versions!sass'
-                )
+                'style!css!sass?sourceMap' : 'style!css!sass'
         }, {
             test: /\.html$/,
             loader: 'raw'
@@ -73,9 +75,7 @@ module.exports = {
     },
 
     plugins: [
-        //new webpack.optimize.OccurenceOrderPlugin(),
-        //new webpack.HotModuleReplacementPlugin(),
-        //new webpack.NoErrorsPlugin(),
+        new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV),
             USER: JSON.stringify({
@@ -113,7 +113,4 @@ if (NODE_ENV == 'production') {
             }
         })
     );
-    // module.exports.plugins.push(
-    //     new ExtractTextPlugin('style.css')
-    // );
 }

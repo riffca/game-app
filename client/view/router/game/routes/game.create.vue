@@ -24,8 +24,7 @@ export default {
   data () {
     return {
     	gamename: '',
-    	username: '',
-      successRoomCreation: false
+    	username: ''
     };
   },
   methods: {
@@ -54,6 +53,7 @@ export default {
         this.$route.router.go({
           name: 'gamePlay',
           query:{
+            state: 'creator',
             gamename: this.gamename
           }
         }); 
