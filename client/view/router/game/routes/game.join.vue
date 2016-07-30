@@ -32,38 +32,38 @@ export default {
     return {
     	selectedGame: '',
     	username: '',
-		games: [
-			{
-				name: 'stas'
-			},
-			{
-				name: 'dina',
-			}
-		]
+		games: ''
     };
   },
   asyncData(resolve, reject){
-  	this.$http.get('/api/game/get-rooms');
+  	this.$http.get('/api/game/join').then(res=>{
+  		if(res.data === 'No games'){
+  			alert('No games to play!');
+  			this.$route.router.go({name: 'index'});
+  			return;
+  		}
+  		resolve({
+  			games: res.data
+  		})
+  	});
   },
   methods:{
  	joinGame(){
-  		this.$http
-  			.post('/api/game/join')
-  			.then(res=>{
-  				let game = this.games[this.selectedGame];
-  				if(!game){
-  					alert('Выберете игру');
-  					return;
-  				}
-  				this.$route.router.go({
-  					name: 'gamePlay',
-  					query:{
-  						username: this.username,
-  						gamename: game.name,
-              			action: 'O'
-  					}
-  				});
+		let game = this.games[this.selectedGame];
+  			if(!game){
+  				alert('Выберете игру');
+  				return;
+  			}
+  			socketService.emit('join room',{
+  				username: this.username,
+  				action: 'O'
   			})
+  			this.$route.router.go({
+  				name: 'gamePlay',
+  				query:{
+  					gamename: this.$route.gamename
+  				}
+  			}); 		
   		}  	
   }
 };

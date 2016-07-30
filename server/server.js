@@ -12,33 +12,53 @@ let io = require('socket.io')(http);
 /*Socket Config
 /*
 */
+let socketRooms = [];
+
 io.on('connection', socket => {
-    //connection
+    //on connetction send to client socketId 
+    socket.emit('get user id', socket.id);
     console.log('user with id "' + socket.id + '" connected');
+
+    //on disconnect delete room from array if it exists
     socket.on('disconnect', () => {
-        console.log('user disconnected');
+        socketRooms.forEach(room => {
+            if (room.creator === socket.id) {
+                socketRooms.splice(socketRooms.indexOf(room), 1);
+                console.log(socketRooms);
+            }
+        });
+        console.log('%s\n%s:%j', 'user disconnected', 'socketRooms', socketRooms);
     });
 
     //create room
-    socket.on('create room', room => {
-        socket.join(room);
-        io.to(room).emit('create room', 'game created');
+    socket.on('create room', data => {
+        socketRooms.push(data.room);
+        socket.join(data.room.name);
+        io.emit('room created', { 
+            message: 'room sucessfully created'
+        });
+        console.log('%s:%j', 'socketRooms', socketRooms);
+    });
+    socket.on('join room',data=>{
+        io.emit('join game',{
+            username: data.username
+        });
     });
 
+
+    //game actions
+    socket.on('game action', data => {
+        io.to(data.room.name).emit('action done', {
+            action: data.action,
+            index: data.index,
+            parentIndex: data.parentIndex
+        });
+    });
     //chat messages
     socket.on('write message', data => {
         io.to(data.room).emit('get message', {
             msg: data.message,
             username: data.username
-        });
-    });
-
-    //game actions
-    socket.on('game action', data => {
-        io.to(data.room).emit('action done', {
-            action: data.action,
-            index: data.index,
-            parentIndex: data.parentIndex
         });
     });
 });
@@ -85,17 +105,33 @@ if (process.env.NODE_ENV === config.NODE_ENV) {
 
 //A P P  A P I
 app.post('/api/game/create', (req, res) => {
-    res.send('ок');
+    //check if room exists
+    let roomExists;
+    socketRooms.forEach(room => {
+         if (room.name === req.body.room.name) {
+             roomExists = true;
+         }
+        console.log(room);
+    });
+    if(roomExists){
+        res.send({
+            success: false,
+            message: 'please choose another game name'
+        });
+        return;
+    } 
+    res.send({
+        success: true,
+         message: 'correct game name'
+    });  
 });
 
-app.get('/api/game/get-rooms',(req,res)=>{
-    let rooms = io.sockets.adapter.rooms;
-    console.log(rooms);
-    res.send('rooms');
-});
-
-app.post('/api/game/join', (req, res) => {
-    res.send('ок');
+app.get('/api/game/join', (req, res) => {
+    if (!socketRooms.length) {
+        res.send('No games');
+        return;
+    }
+    res.send(socketRooms);
 });
 app.post('/api/game/play', (req, res) => {
     res.send('ок');

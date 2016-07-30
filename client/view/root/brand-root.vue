@@ -1,6 +1,6 @@
 <template>
 <div id="brand-root">
-	<a v-link="{name: 'index'}" class="brand-logo">Tic Tac Toe Game</a>
+	<a href="/" class="brand-logo">Tic Tac Toe Game</a>
 </div>
 </template>
 

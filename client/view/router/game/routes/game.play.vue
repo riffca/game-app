@@ -1,32 +1,46 @@
 <template>
 <div id="game-play">
 	<div class="game-section">
-		<h2>Game: {{$route.query.gamename}}</h2>	
-		<tic-tac-toe-game :room="room"></tic-tac-toe-game>
+		<h2>Game: {{$route.query.gamename}}</h2>
+		<h1 v-if="!playerJoined">waiting for second player</h1>	
+		<tic-tac-toe-game :room="room" v-if="playerJoined"></tic-tac-toe-game>
 	</div>
 	<div class="chat-section">
-		<h2>User: {{$route.query.username}}</h2>
+		<h2>Chat</h2>
 		<chat :room="room"></chat>
 	</div>
 </div>
 </template>
 
 <script>
-import chat from '../components/chat';
+//socket io
 import socketService from 'service/socket';
+//html
+import chat from '../components/chat';
 import ticTacToeGame from '../components/tic-tac-toe-game';
+//Component
 export default {
   components: {ticTacToeGame,chat},
   data(){
   	return {
-  	   room: '',
+  		playerJoined: false,
+  		firstPlayer: '',
+  		secondPalyer: ''
   	}
   },
   created(){
-  	this.room =  this.$route.query.gamename
-  	socketService.emit('create room',this.room);
-  	socketService.on('create room',msg=>{
-  		logger('game created');
+  	socketService.on('get creator',data=>{
+  		this.firstPlayer = new Player({
+  			name: data.name,
+  			action: data.action
+  		});
+  	});
+  	socketService.on('join game',data=>{
+  		this.playerJoined = true;
+  		this.secondPalyer = new Player({
+  			name: data.name,
+  			action: data.action
+  		});
   	});
   }
 };

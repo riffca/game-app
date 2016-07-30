@@ -5,7 +5,6 @@ export default class {
 		wins,
 	}){
 		this.name = name;
-		this.game = game;
-		this.wins = wins;
+		this.action = game;
 	}
 }

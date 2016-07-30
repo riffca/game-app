@@ -17,30 +17,47 @@
 </div>
 </template>
 <script>
+import socketService from 'service/socket';
 import formWrapper from 'parts/form-wrapper';
 export default {
   components: {formWrapper},
   data () {
     return {
     	gamename: '',
-    	username: ''
+    	username: '',
+      successRoomCreation: false
     };
   },
   methods: {
   	createGame(){
-  		this.$http
-  			.post('/api/game/create')
-  			.then(res=>{
-  				this.$route.router.go({
-  					name: 'gamePlay',
-  					query:{
-  						username: this.username,
-  						gamename: this.gamename,
-              action: 'X'
-  					}
-  				});
-  			});
+      this.$http.post('/api/game/create',{
+        room:{
+          name:this.gamename
+        }
+      }).then(res=>{
+        //check if room exists
+        if(!res.data.success){
+          alert(res.data.message);
+          return;
+        } 
+        socketService.emit('create room',{
+          room:{
+            name: this.gamename,
+            creator: this.$root.playerSocketId
+          }
+        })
+      });
   	}
+  },
+  created(){
+    socketService.on('room created',data=>{
+        this.$route.router.go({
+          name: 'gamePlay',
+          query:{
+            gamename: this.gamename
+          }
+        }); 
+    })    
   }
 };
 </script>
