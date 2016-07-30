@@ -12,9 +12,6 @@ import './style.scss';
 /*Dependecies
 /*
 */
-import soketIo from 'vue-socket.io';
-Vue.use(soketIo,'http://localhost:3000');
-
 import vueRouter from 'vue-router';
 Vue.use(vueRouter);
 

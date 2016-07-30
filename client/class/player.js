@@ -1,10 +1,11 @@
 export default class {
 	constructor({
 		name,
+		action,
 		game,
-		wins,
 	}){
 		this.name = name;
-		this.action = game;
+		this.action = action;
+		this.game = game;
 	}
 }

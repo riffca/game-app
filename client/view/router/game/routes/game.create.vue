@@ -29,16 +29,17 @@ export default {
   },
   methods: {
   	createGame(){
+      //check if room exists
       this.$http.post('/api/game/create',{
         room:{
           name:this.gamename
         }
       }).then(res=>{
-        //check if room exists
         if(!res.data.success){
           alert(res.data.message);
           return;
         } 
+        //if not exists 
         socketService.emit('create room',{
           room:{
             name: this.gamename,
@@ -49,12 +50,14 @@ export default {
   	}
   },
   created(){
+    //listen socket events
     socketService.on('room created',data=>{
         this.$route.router.go({
           name: 'gamePlay',
           query:{
             state: 'creator',
-            gamename: this.gamename
+            gamename: this.gamename,
+            username: this.username
           }
         }); 
     })    

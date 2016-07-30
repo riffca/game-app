@@ -1,13 +1,13 @@
 <template>
 <div id="game-play">
 	<div class="game-section">
-		<h2>Game: {{$route.query.gamename}}</h2>
+		<h2>Game: {{$route.query.gamename}}, Creator: {{firstPlayer.name}}, Visitor: {{secondPlayer.name}}</h2>
 		<h1 v-if="!playerJoined">waiting for second player</h1>	
-		<tic-tac-toe-game :room="room" v-if="playerJoined"></tic-tac-toe-game>
+		<tic-tac-toe-game v-if="playerJoined"></tic-tac-toe-game>
 	</div>
 	<div class="chat-section">
 		<h2>Chat</h2>
-		<chat :room="room"></chat>
+		<chat></chat>
 	</div>
 </div>
 </template>
@@ -18,30 +18,90 @@ import socketService from 'service/socket';
 //html
 import chat from '../components/chat';
 import ticTacToeGame from '../components/tic-tac-toe-game';
+//class
+import Player from 'class/player';
 //Component
 export default {
   components: {ticTacToeGame,chat},
   data(){
   	return {
   		playerJoined: false,
-  		firstPlayer: '',
-  		secondPalyer: ''
+  		firstPlayer: {},
+  		secondPlayer: {},
+      currentPlayer: {}
   	}
   },
   created(){
-  	socketService.on('get creator',data=>{
+  	let query = this.$route.query;
+    //
+    //if game creator
+    //
+  	if(query.state === 'creator'){
+
+      //create new firstPlayer
   		this.firstPlayer = new Player({
-  			name: data.name,
-  			action: data.action
+        game: query.gamename,
+  			name: query.username,
+  			action: 'X'
   		});
-  	});
-  	socketService.on('join game',data=>{
-  		this.playerJoined = true;
-  		this.secondPalyer = new Player({
-  			name: data.name,
-  			action: data.action
+
+      //choose current ui player
+      this.currentPlayer = this.firstPlayer;
+
+      //get secondPlayer
+      socketService.on('join game',data=>{
+        this.playerJoined = true;
+        //create new secondPlayer
+        this.secondPlayer = new Player({
+          game: query.gamename,
+          name: data.username,
+          action: 'O'
+        });
+      });
+
+      //send creator to  visitor ui
+      socketService.on('get creator',data=>{
+        socketService.emit('send creator',{
+          username: this.firstPlayer.name
+        })
+      });
+
+    //
+    //if game visitor
+    // 
+  	} else if(query.state === 'visitor'){
+      this.playerJoined = true;
+      //create new secondPlayer
+  		this.secondPlayer = new Player({
+        game: query.gamename,
+  			name: query.username,
+  			action: 'O'
   		});
-  	});
+      //make current ui player
+      this.currentPlayer = this.secondPlayer;
+
+      //tell creator about joining
+      socketService.emit('join room',{
+        username: this.secondPlayer.name,
+        room: query.gamename
+      })
+      //get second player
+      socketService.emit('get creator','');
+      socketService.on('send creator',data=>{
+      //create new firstPlayer
+        this.firstPlayer = new Player({
+          game: query.gamename,
+          name: data.username,
+          action:'X'
+        })
+      });
+    //
+    //else
+    //
+  	} else {
+      //pretent to break ui
+      window.location = '/';
+    }
   }
 };
 </script>

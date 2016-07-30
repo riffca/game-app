@@ -20,11 +20,10 @@
 import formWrapper from 'parts/form-wrapper';
 import socketService from 'service/socket';
 export default {
-  props:['room'],
   components:{formWrapper},
   data () {
     return {
-      writerUsername: '',
+      room: this.$parent.currentPlayer.game,
   		message: '',
   		messages:[]
     };

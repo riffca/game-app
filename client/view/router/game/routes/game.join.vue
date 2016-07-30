@@ -54,15 +54,12 @@ export default {
   				alert('Выберете игру');
   				return;
   			}
-  			socketService.emit('join room',{
-  				username: this.username,
-  				action: 'O'
-  			})
   			this.$route.router.go({
   				name: 'gamePlay',
   				query:{
-  					status: 'visitor',
-  					gamename: this.$route.gamename
+  					state: 'visitor',
+  					gamename: game.name,
+  					username: this.username
   				}
   			}); 		
   		}  	

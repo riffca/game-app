@@ -16,10 +16,12 @@ let socketRooms = [];
 
 io.on('connection', socket => {
     //on connetction send to client socketId 
+
     socket.emit('get user id', socket.id);
     console.log('user with id "' + socket.id + '" connected');
 
     //on disconnect delete room from array if it exists
+
     socket.on('disconnect', () => {
         socketRooms.forEach(room => {
             if (room.creator === socket.id) {
@@ -31,6 +33,7 @@ io.on('connection', socket => {
     });
 
     //create room
+
     socket.on('create room', data => {
         socketRooms.push(data.room);
         socket.join(data.room.name);
@@ -39,21 +42,38 @@ io.on('connection', socket => {
         });
         console.log('%s:%j', 'socketRooms', socketRooms);
     });
+
+ 
+    //Get gamePlay users
+
     socket.on('join room',data=>{
+        socket.join(data.room);
         io.emit('join game',{
+            username: data.username
+        });
+    });
+
+    socket.on('get creator',data=>{
+        io.emit('get creator');
+    });
+
+    socket.on('send creator',data=>{
+        io.emit('send creator',{
             username: data.username
         });
     });
 
 
     //game actions
+
     socket.on('game action', data => {
-        io.to(data.room.name).emit('action done', {
+        io.to(data.room).emit('action done', {
             action: data.action,
             index: data.index,
             parentIndex: data.parentIndex
         });
     });
+
     //chat messages
     socket.on('write message', data => {
         io.to(data.room).emit('get message', {
@@ -61,6 +81,7 @@ io.on('connection', socket => {
             username: data.username
         });
     });
+
 });
 
 /**

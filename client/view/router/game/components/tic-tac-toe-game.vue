@@ -15,11 +15,11 @@
 import socketService from 'service/socket';
 
 export default {
-  props:['room'],
   components:{},
   data () {
     return {
-    	action: this.$route.query.action,
+    	room: this.$parent.currentPlayer.game,
+    	action: this.$parent.currentPlayer.action,
     	playground: [
 	      [
 	        {id: 0, content: ''},
@@ -41,8 +41,10 @@ export default {
   },
   methods:{
   	makeAction(index,parentIndex){
+  		//find square
   		let square = this.playground[parentIndex][index];
   		square.content = this.action;
+  		//send to another user action options
   		socketService.emit('game action',{
   			room: this.room,
   			action: this.action,
@@ -52,6 +54,7 @@ export default {
   	}
   },
   created(){
+  	//listen to actions
   	socketService.on('action done',data=>{
   		let square = this.playground[data.parentIndex][data.index];
   		square.content = data.action;
