@@ -1,5 +1,4 @@
 <template>
-  {{$data | json}}
 	<brand-root></brand-root>
   <router-view></router-view>
 </template>

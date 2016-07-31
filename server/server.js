@@ -77,8 +77,9 @@ io.on('connection', socket => {
     //chat messages
     socket.on('write message', data => {
         io.to(data.room).emit('get message', {
-            msg: data.message,
-            username: data.username
+            text: data.text,
+            username: data.username,
+            css: data.css
         });
     });
 
