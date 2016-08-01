@@ -1,5 +1,5 @@
 <template>
-<div class="no-games" v-if="!anyGames">
+<div class="no-games" v-if="!anyGames || !games.length">
 	No games to play. Create or wait!
 </div>
 <div id="game-join" v-if="anyGames">
