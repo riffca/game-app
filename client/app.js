@@ -1,8 +1,8 @@
 //debug socket.io
 
-// if (NODE_ENV === 'development') {
-//     localStorage.debug = 'socket.io-client:socket';
-// }
+if (NODE_ENV === 'development') {
+    localStorage.debug = 'socket.io-client:socket';
+}
 
 /**
 /*

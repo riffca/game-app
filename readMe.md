@@ -1,8 +1,9 @@
 #Game app
 
+windows start
+
 ```BASH
-npm install
-npm build
+npm install --production
 npm start
 
 ```
