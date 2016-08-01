@@ -171,12 +171,12 @@ export default {
 	}
 	.chat-section {
 		display: relative;
-		min-width: 200px;
+		min-width: 350px;
 		flex: 3;
 	}
 	.game-section {
+    min-width: 500px;
     height: 100%;
-		min-width: 500px;
 		flex:6;
     .main-message {
       @include change-animation(0%,-20%);

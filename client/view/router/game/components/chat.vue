@@ -55,7 +55,8 @@ export default {
       let message = {
         id: ++getId,
         text: data.text,
-        player: data.username
+        player: data.username,
+        css: data.css
       }
   		this.messages.push(message);
   		this.message = '';

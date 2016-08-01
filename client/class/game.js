@@ -1,3 +1,4 @@
+//Not use yet
 export default class Game {
 	constructor({
 		creator,

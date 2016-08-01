@@ -1,5 +1,8 @@
 //debug socket.io
-localStorage.debug = 'socket.io-client:socket';
+
+// if (NODE_ENV === 'development') {
+//     localStorage.debug = 'socket.io-client:socket';
+// }
 
 /**
 /*
@@ -36,7 +39,7 @@ let rootComponent = Vue.extend(require('root/root.vue'));
 let router = new vueRouter({
     history: false
 });
-import routeMap from 'view/router'; 
+import routeMap from 'view/router';
 router
     .map(routeMap)
     .start(rootComponent, '#application', () => {

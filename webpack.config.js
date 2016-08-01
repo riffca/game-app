@@ -58,7 +58,7 @@ module.exports = {
         }, {
             test: /\.scss$/,
             loader: NODE_ENV === 'development' ?
-                'style!css!sass?sourceMap' : 'style!css!sass'
+                'style!css!sass?sourceMap' : 'style!css!postcss!sass'
         }, {
             test: /\.html$/,
             loader: 'raw'
@@ -103,7 +103,7 @@ module.exports = {
 
 
 
-if (NODE_ENV == 'production') {
+if (NODE_ENV !== 'development') {
     module.exports.plugins.push(
         new webpack.optimize.UglifyJsPlugin({
             compress: {

@@ -112,9 +112,11 @@ class SocketLogic {
 
 	//leave room logic
 	leaveRoomLogic(socket) {
-
+		//need to fix logic with visitor not
 		let rooms = this.rooms;
 		let io = this.io;
+
+		if(!rooms.length) return;
 
 	    rooms.forEach(room => {
 
@@ -132,7 +134,7 @@ class SocketLogic {
 	            socket.leave(room.name);
 	            rooms.splice(rooms.indexOf(room), 1);
 	            //update view with visitor gameplay
-	            io.emit('creator desconnected');
+	            io.emit('creator disconnected');
 
 	            this.UpdateFreeRoomsList();
 

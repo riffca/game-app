@@ -72,6 +72,20 @@ export default {
   			this.userTurn = true;
   		}
   	},
+    nobodyWins(){
+      let count = 0;
+      this.playground.forEach(item=>{
+        item.forEach(square=>{
+          if(square.content !== ''){
+            count++;
+          }
+        })
+      });
+      if(count === 9){
+        return true;
+      }
+      return false;
+    },
   	checkWinner(action){
   		let victory;
   		this.winPoints().forEach(points=>{
@@ -79,7 +93,7 @@ export default {
 	  			victory = points;
 	  		}	
   		});
-  		//if there is win combination
+  		//if win combination
   		if(victory){
   		 	this.message = action + ' wins';
   		 	alertTime(()=>{
@@ -87,7 +101,14 @@ export default {
   		 		this.message = '';
   		 	});
   		 	socketService.emit('player win',{action: action, room: this.player.game});
-  		}
+  		} 
+      if(this.nobodyWins() && !victory){
+        this.message = 'Nobody wins';
+        alertTime(()=>{
+          this.newGame();
+          this.message = '';
+        })
+      }
   	},
   	//check is square empty
   	isEmpty(square){
@@ -99,6 +120,9 @@ export default {
   	},
   	//make action
   	makeAction(index,parentIndex){
+      if(this.message){
+        return;
+      }
   		//find square
   		let square = this.playground[parentIndex][index];
   		if(this.userTurn){
@@ -133,7 +157,6 @@ export default {
   	socketService.on('action done',data=>{
   		let square = this.playground[data.parentIndex][data.index];
   		square.content = data.action;
-
   		//check who is winner
   		this.checkWinner(data.action);
 
@@ -149,7 +172,7 @@ export default {
         this.message = this.player.name + ' leave game!';
 
         alertTime(()=>{
-          socketService.emit('leave room');
+          //socketService.emit('leave room');
           this.$route.router.go({name: 'index'});  
         })
 
@@ -183,7 +206,7 @@ function alertTime(func){
 </script>
 
 <style lang="sass">
-
+@import '../../../variables';
 #tic-tac-toe-game{
 	padding-top:50px;
 	cursor: pointer;
@@ -204,17 +227,35 @@ function alertTime(func){
 			height: 200px;
 			width: 200px;
 			box-shadow: 1px 1px 1px grey;
-			@media screen and (max-height: 842px){
-				height: 150px;
-				width: 150px;
-			}
+      @media screen and(max-width: 1230px){
+        & {
+          height: 170px;
+          width: 170px;
+        }
+      }
 
-			@media screen and (max-height: 676px){
-				height: 100px;
-				width: 100px;
+      @media screen and(max-width: 1120px){
+        & {
+          height: 120px;
+          width: 120px;
+        }
+      }
+
+      @media screen and (max-height: 842px){
+        & { 
+          height: 150px;
+          width: 150px;
+        }
+      }
+
+			@media screen and (max-height: 676px), screen and (max-width: 650px){
+				& { 
+          height: 100px;
+          width: 100px;
+        }
 			}
 			&:hover {
-
+        outline: 1px solid lighten($brand-bg,35%);
 			}
 		}
 	}
