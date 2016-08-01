@@ -125,7 +125,11 @@ export default {
   	if(this.player.action === 'X'){
   		this.userTurn = true;
   	}
-  	//listen to socket actions
+  	/**
+    /*
+    /*Listen to socket actions
+    /*
+    */
   	socketService.on('action done',data=>{
   		let square = this.playground[data.parentIndex][data.index];
   		square.content = data.action;
@@ -140,6 +144,28 @@ export default {
   			this.userTurn = true;
   		}
   	});
+
+    socketService.on('creator disconnected', ()=>{
+        this.message = this.player.name + ' leave game!';
+
+        alertTime(()=>{
+          socketService.emit('leave room');
+          this.$route.router.go({name: 'index'});  
+        })
+
+    });
+
+    socketService.on('visitor disconnected', ()=>{
+        this.message = this.player.name + ' leave game!';
+
+        alertTime(()=>{
+          this.$parent.playerJoined = false;
+          this.player.wins = 0;
+          this.message = '';
+          this.newGame();
+        })
+
+    });
   }
 };
 

@@ -1,5 +1,7 @@
 <template>
 <div id="game-play">
+
+  <!--Game-->
 	<div class="game-section">
 		<div class="game-info" v-if="playerJoined">
       <span class="player-left">
@@ -19,10 +21,13 @@
 		<div class="main-message" v-if="!playerJoined">Waiting for second player</div>	
 		<tic-tac-toe-game v-if="playerJoined" :player="player"></tic-tac-toe-game>
 	</div>
+
+  <!--Chat-->
 	<div class="chat-section">
 		<h2>Chat</h2>
 		<chat :player="player"></chat>
 	</div>
+
 </div>
 </template>
 <script>
@@ -174,9 +179,10 @@ export default {
 		min-width: 500px;
 		flex:6;
     .main-message {
+      @include change-animation(0%,-20%);
+      @include center-page-container(100%);
       font-size: 2rem;
       text-align: center;
-      @include center-page-container(100%);
     }
     .game-info{
       cursor: default;

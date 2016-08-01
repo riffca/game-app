@@ -22,7 +22,7 @@
 					   autocomplete="off"
 					   placeholder="Enter your nickname">
 			</div>
-			<button type="submit">Go</button>
+			<button type="submit">Play</button>
 		</form>
 	</form-wrapper>
 </div>
@@ -52,9 +52,6 @@ export default {
   		if(res.data === 'No games'){
   			//change view
   			this.anyGames = false;
-  			setTimeout(()=>{
-  				this.$route.router.go({name: 'index'})
-  			},2500);
   			return;
   		}
   		//change view
@@ -80,18 +77,32 @@ export default {
   				}
   			}); 		
   		}  	
+  },
+  created(){
+  	/**
+  	/*Listen to socket evets
+  	*/
+  	socketService.on('new rooms',rooms=>{
+  		if(!rooms.length){
+  		   this.anyGames = false;
+  		}
+  		this.games = rooms;
+  		this.anyGames = true;
+  	})
   }
 };
 </script>
 
 <style lang="sass">
 @import '../../../variables';
+
 .no-games {
 	position: relative;
 	height: 100%;
 	text-align: center;
 	font-size: 1.6rem;
 	padding-top:20%;
+	@include change-animation(100%,100%);
 }
 #game-join {
 	.select-game {

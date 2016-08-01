@@ -9,12 +9,13 @@
     "node": "none"
   },
   "scripts": {
-    "iodebug": "SET DEBUG=socket.io:socket && nodemon server/server.js",
     "push": "git push -u origin master",
+    "iodebug": "SET DEBUG=socket.io:socket && nodemon server/server.js",
     "debug": "SET DEBUG=http && nodemon server/server.js",
-    "start": "nodemon server/server.js",
-    "test": "webpack-dev-server --inline --hot",
-    "history": "webpack-dev-server --inline --hot --history-api-fallback",
+    "start": "SET NODE_ENV=production && node server/server.js",
+    "test": "nodemon server/server.js",
+    "dev": "webpack-dev-server --inline --hot",
+    "devhistory": "webpack-dev-server --inline --hot --history-api-fallback",
     "build": "SET NODE_ENV=production && webpack"
   },
   "keywords": [],

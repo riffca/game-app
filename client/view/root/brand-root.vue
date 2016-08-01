@@ -14,13 +14,11 @@ export default {
 	methods:{
 		createGame(){
 			//if user disconect from aother game
-			let game = this.$route.query.gamename;
-			if(game){
-				socketService.emit('leave room',{room: game});
-			}
+			socketService.emit('leave room');
 			this.$route.router.go({name:'gameCreate'});
 		},
 		joinGame(){
+			socketService.emit('leave room');
 			this.$route.router.go({name:'gameJoin'});
 		}
 	}

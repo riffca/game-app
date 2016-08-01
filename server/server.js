@@ -12,7 +12,6 @@ let io = require('socket.io')(http);
 /*Socket Config
 /*
 */
-//
 
 //custom socket rooms
 let socketRooms = [];
@@ -26,39 +25,67 @@ class Room {
     setVisitor(visitor) {
         this.visitor = visitor;
     }
+
 }
 
+//leave room logic
+function leaveRoomLogic(socket) {
+    socketRooms.forEach(room => {
+
+        if (room.visitor === socket.id) {
+            socket.leave(room.name);
+            //update view with creator gameplay
+            io.emit('visitor disconnected');
+            //update view with chat messages
+            io.emit('delete chat messages');
+            //update view with rooms list
+            io.emit('new rooms',filterRooms(room));
+        }
+        if (room.creator === socket.id) {
+            socket.leave(room.name);
+            socketRooms.splice(socketRooms.indexOf(room), 1);
+            //update view with visitor gameplay
+            io.emit('creator desconnected');
+            //update view with rooms list
+            io.emit('new rooms',filterRooms());
+        }
+
+    });
+}
+
+//search room without visitor
+function filterRooms(vistorLeaveRoom){
+    if(vistorLeaveRoom){
+        vistorLeaveRoom.visitor = '';
+    }
+    return socketRooms.filter(room=>{
+        return room.visitor === '';
+    });
+}
 
 io.on('connection', socket => {
 
     //on connetction send to client socketId 
-
     socket.emit('get user id', socket.id);
-    console.log('user with id "' + socket.id + '" connected');
 
     //on disconnect delete room from array if it exists
-
     socket.on('disconnect', () => {
         /**
         /*working with custom socket rooms
         */
-        socketRooms.forEach(room => {
-            if (room.visitor === socket.id) {
-                socket.leave(room.name);
-                socket.emit('visitor leave room', {room: room.name});
-            }
-
-            if (room.creator === socket.id) {
-                socket.leave(room.name);
-                socketRooms.splice(socketRooms.indexOf(room), 1);
-                socket.emit('room deleted', {room: room.name});
-            }
-        });
+        leaveRoomLogic(socket);
         console.log('%s\n%s:%j', 'user disconnected', 'socketRooms', socketRooms);
     });
 
-    //create room
+    //Leave room
+    socket.on('leave room', () => {
+        /**
+        /*working with custom socket rooms
+        */
+        leaveRoomLogic(socket);
+    });
 
+    //create room
     socket.on('create room', data => {
         /**
         /*working with custom socket rooms
@@ -69,7 +96,10 @@ io.on('connection', socket => {
         io.emit('room created', {
             message: 'room sucessfully created'
         });
-        console.log('%s:%j', 'socketRooms', socketRooms);
+
+        //update view with rooms
+        io.emit('new rooms',socketRooms);
+
     });
 
 
@@ -78,30 +108,19 @@ io.on('connection', socket => {
         /**
         /*working with custom socket rooms
         */
-        socketRooms.forEach(room=>{
-            if(room.name === data.room) {
+
+        socketRooms.forEach(room => {
+            if (room.name === data.room) {
                 room.setVisitor(socket.id);
             }
         });
 
-        console.log(socketRooms);
         socket.join(data.room);
         io.emit('join game', {
             username: data.username
         });
+        io.emit('new rooms',filterRooms());
 
-    });
-
-    //Leave room
-    socket.on('leave room', data=>{
-        socket.leave(data.room);
-        if(data.state === 'creator'){
-
-            io.emit('creator leave');
-        }
-        if(data.state === 'visitor'){
-            io.emit('visitor leave');
-        }
     });
 
     socket.on('get creator', data => {
@@ -125,8 +144,8 @@ io.on('connection', socket => {
         });
     });
 
-    socket.on('player win', data =>{
-        socket.broadcast.to(data.room).emit('player win',data);
+    socket.on('player win', data => {
+        socket.broadcast.to(data.room).emit('player win', data);
     });
 
     //chat messages
@@ -167,8 +186,13 @@ app.use(finalInterceptor);
 //S T A T I C S 
 app.use(express.static(__dirname + '/public'));
 
+
 // W E B P A C K
-if (process.env.NODE_ENV === config.NODE_ENV) {
+
+process.env.NODE_ENV = 'development';
+
+if (process.env.NODE_ENV === 'development') {
+
     const webpack = require('webpack');
     const webpackConfig = require('../webpack.config');
     const compiler = webpack(webpackConfig);
@@ -178,6 +202,7 @@ if (process.env.NODE_ENV === config.NODE_ENV) {
         publicPath: webpackConfig.output.publicPath,
     }));
     app.use(require('webpack-hot-middleware')(compiler));
+
 }
 
 //A P P  A P I
@@ -215,7 +240,8 @@ app.get('/api/game/join', (req, res) => {
         res.send('No games');
         return;
     }
-    res.send(socketRooms);
+
+    res.send(filterRooms());
 });
 app.post('/api/game/play', (req, res) => {
     res.send('ок');

@@ -20,7 +20,7 @@
              autocomplete="off" 
              required>
 		</div>
-		<button type="submit">Go</button>
+		<button type="submit">Play</button>
 	</form>
 </form-wrapper>
 

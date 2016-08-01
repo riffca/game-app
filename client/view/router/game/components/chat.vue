@@ -34,7 +34,7 @@ export default {
     return {
       room: this.player.game,
   		message: '',
-  		messages:[]
+  		messages: []
     };
   },
   methods:{
@@ -60,8 +60,11 @@ export default {
   		this.messages.push(message);
   		this.message = '';
   	});
-  }
 
+    socketService.on('delete chat messages',()=>{
+      this.messages = [];
+    })
+  }
 };
 </script>
 
