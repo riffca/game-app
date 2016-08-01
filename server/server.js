@@ -82,7 +82,7 @@ app.get('*', (req, res) => {
 
 process.env.NODE_ENV = 'development';
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'development') {
     //Logging
     let debug = require('debug')('http');
     let interceptor = require('express-interceptor');
