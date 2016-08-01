@@ -1,0 +1,36 @@
+<div id='grid'>
+  
+  <div class='modal' v-if="modal">
+    Welcome to Beach Tic Tac Toe.<br />
+    Please choose a letter to play with:<br />
+    <input maxlength='1' size='2' v-model='myToken'><br />
+    and one for the CPU:<br />
+    <input maxlength='1' size='2' v-model='compToken'>
+    <div class='btn' id='playerbtn' v-on:click="startGame">
+      PLAYER GOES FIRST
+    </div>
+    <div class='btn' id='cpubtn' v-on:click="startCPU">
+      CPU GOES FIRST
+    </div>
+  </div>
+  
+  <div class='message'>
+    <h2>{{ message }}</h2>
+  </div>
+  <div class='btns'>
+    <div class='btn' v-on:click="clearAll()">
+      new game
+    </div>
+  </div>
+  <div class='row'>
+    <div v-for='row in board'>
+      <div v-for='square in row'>
+        <div class='{{ square.background }} box' v-on:click="mark(square)"
+          <div class='contents'>
+            {{square.contents}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

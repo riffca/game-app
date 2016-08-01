@@ -1,5 +1,8 @@
 <template>
-<div id="game-join">
+<div class="no-games" v-if="!anyGames">
+	No games to play. Create or wait!
+</div>
+<div id="game-join" v-if="anyGames">
 	<div class="select-game">
 		<div class="game" 
 			v-for="game in games"
@@ -16,6 +19,7 @@
 				       required
 					   id="username" 
 					   v-model="username" 
+					   autocomplete="off"
 					   placeholder="Enter your nickname">
 			</div>
 			<button type="submit">Go</button>
@@ -24,24 +28,37 @@
 </div>
 </template>
 <script>
+/**
+/*
+/*J O I N  G A M E
+/*
+*/
 import socketService from 'service/socket';
 import formWrapper from 'parts/form-wrapper';
 export default {
   components: {formWrapper},
   data () {
     return {
+    	anyGames: false,
     	selectedGame: '',
     	username: '',
 		games: ''
     };
   },
+
   asyncData(resolve, reject){
   	this.$http.get('/api/game/join').then(res=>{
+  		//check for games
   		if(res.data === 'No games'){
-  			alert('No games to play!');
-  			this.$route.router.go({name: 'index'});
+  			//change view
+  			this.anyGames = false;
+  			setTimeout(()=>{
+  				this.$route.router.go({name: 'index'})
+  			},2500);
   			return;
   		}
+  		//change view
+  		this.anyGames = true;
   		resolve({
   			games: res.data
   		})
@@ -51,7 +68,7 @@ export default {
  	joinGame(){
 		let game = this.games[this.selectedGame];
   			if(!game){
-  				alert('Выберете игру');
+  				alert('Choose game');
   				return;
   			}
   			this.$route.router.go({
@@ -68,20 +85,31 @@ export default {
 </script>
 
 <style lang="sass">
+@import '../../../variables';
+.no-games {
+	position: relative;
+	height: 100%;
+	text-align: center;
+	font-size: 1.6rem;
+	padding-top:20%;
+}
 #game-join {
 	.select-game {
 		text-align: center;
 		margin: 0 auto;
 			.game {
+			color: lighten($brand-bg,24%);
 			cursor: pointer;
 			user-select: none;
 			display: inline-block;
 			height: 100px;
 			width: 100px;
-			text-align: conter;
+			text-align: center;
 			line-height: 100px;
+			font-size:1.5rem;
 			&.selected {
-				background:red; 
+				background:lighten($application-bg,2%);
+				border:1px solid darken($application-bg,10%);
 			}
 		}
 	}

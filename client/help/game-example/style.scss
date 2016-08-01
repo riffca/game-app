@@ -1,0 +1,105 @@
+@import url(https://fonts.googleapis.com/css?family=Jura);
+body {
+  font-family: 'Jura', sans-serif;
+  background-image: url('https://farm3.staticflickr.com/2918/14106325049_42877a17a4_b.jpg');
+  background-size: cover;
+}
+
+#grid {
+  width: 320px;
+  margin: auto;
+}
+
+.modal {
+  border-style: solid;
+  background: white;
+  width: 250px;
+  top: 25%;
+  padding-top: 30px;
+  padding-bottom: 20px;
+  text-align: center;
+  position: fixed;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -133px;
+  .btn {
+    padding: 10px;
+    margin: 20px;
+    cursor: pointer;
+  }
+  #playerbtn {
+    background: lightgreen;
+    &:hover {
+      background: darkgreen;
+      color: lightgray;
+    }
+  }
+  #cpubtn {
+    background: pink;
+    &:hover {
+      background: red;
+      color: lightgray;
+    }
+  }
+}
+
+.row {
+  width: 100%;
+  .player {
+    background: #7AE058;
+  }
+  .computer {
+    background: #DBED82;
+  }
+  .winner {
+    background: #F073A7;
+  }
+  .box {
+    border-style: solid;
+    border-width: 1px;
+    width: 30.33%;
+    height: 105px;
+    float: left;
+    text-align: center;
+    margin: 2px;
+    cursor: pointer;
+    color: #33553f;
+    line-height: 100px;
+    font-size: 400%;
+    &:hover {
+      background: #DBB763;
+    }
+  }
+}
+
+.btns {
+  margin-bottom: 20px;
+  margin-left: 5px;
+  margin-right: 5px;
+  .btn {
+    background: lightblue;
+    height: 30px;
+    margin-top: 2px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 30px;
+    padding: 10px;
+    margin-left: -5px;
+    margin-right: 4px;
+    &:hover {
+      background: #A1D490;
+    }
+  }
+}
+
+.message {
+  line-height: 30px;
+  h2 {
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.unmarked {
+  background: #E3D7B3;
+}

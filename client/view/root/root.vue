@@ -22,6 +22,9 @@ export default {
   	socketService.on('get user id', data=>{
   		this.playerSocketId = data;
   	})
+    if(this.$route.query.gamename){
+      this.$route.router.go({name: 'index'});
+    }
   }
 };
 </script>

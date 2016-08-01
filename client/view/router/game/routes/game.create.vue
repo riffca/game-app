@@ -4,11 +4,21 @@
 	<form @submit.prevent="createGame()">
 		<div class="input-control">
 			<label for="gamename">Game name:</label>
-			<input type="text" id="gamename" v-model="gamename" placeholder="Enter game name" required>
+			<input type="text" 
+             id="gamename"  
+             v-model="gamename"
+             placeholder="Enter game name"
+             autocomplete="off"
+             required>
 		</div>
 		<div class="input-control">
 			<label for="username">Your nickname:</label>
-			<input type="text" id="username" v-model="username" placeholder="Enter user name" required>
+			<input type="text" 
+             id="username" 
+             v-model="username" 
+             placeholder="Enter user name"
+             autocomplete="off" 
+             required>
 		</div>
 		<button type="submit">Go</button>
 	</form>
@@ -17,6 +27,11 @@
 </div>
 </template>
 <script>
+/**
+/*
+/*C R E A T E  G A M E
+/*
+*/
 import socketService from 'service/socket';
 import formWrapper from 'parts/form-wrapper';
 export default {

@@ -7,5 +7,9 @@ export default class {
 		this.name = name;
 		this.action = action;
 		this.game = game;
+		this.wins = 0;
+	}
+	win(){
+		this.wins += 1;
 	}
 }

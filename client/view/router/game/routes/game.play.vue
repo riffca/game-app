@@ -1,18 +1,36 @@
 <template>
 <div id="game-play">
 	<div class="game-section">
-		<h2>Game: {{$route.query.gamename}}, Creator: {{firstPlayer.name}}, Visitor: {{secondPlayer.name}}</h2>
-		<h1 v-if="!playerJoined">waiting for second player</h1>	
-		<tic-tac-toe-game v-if="playerJoined"></tic-tac-toe-game>
+		<div class="game-info" v-if="playerJoined">
+      <span class="player-left">
+        {{creator.name}}
+        <div class="player-wins">
+        {{creator.wins }}
+        </div>
+      </span>
+      Game: {{$route.query.gamename}} 
+      <span class="player-right">
+        {{visitor.name}}
+        <div class="player-wins" v-show="visitor">
+          {{ visitor.wins}}
+        </div>
+      </span>
+    </div>
+		<div class="main-message" v-if="!playerJoined">Waiting for second player</div>	
+		<tic-tac-toe-game v-if="playerJoined" :player="player"></tic-tac-toe-game>
 	</div>
 	<div class="chat-section">
 		<h2>Chat</h2>
-		<chat></chat>
+		<chat :player="player"></chat>
 	</div>
 </div>
 </template>
-
 <script>
+/**
+/*
+/*G E T  A L L  U S E R S  T O  G A M E
+/*
+*/
 //socket io
 import socketService from 'service/socket';
 //html
@@ -26,33 +44,40 @@ export default {
   data(){
   	return {
   		playerJoined: false,
-  		firstPlayer: {},
-  		secondPlayer: {},
-      currentPlayer: {}
+      //current player
+      player: {},
+      //current player
+      creator: {},
+      visitor: {},
   	}
   },
   created(){
+    /**
+    /*
+    /*Choose roles for game palyers
+    /*
+    */
+    //get game state and data from url query
   	let query = this.$route.query;
     //
     //if game creator
     //
   	if(query.state === 'creator'){
-
-      //create new firstPlayer
-  		this.firstPlayer = new Player({
+      //create new creator
+  		this.creator = new Player({
         game: query.gamename,
   			name: query.username,
   			action: 'X'
   		});
 
-      //choose current ui player
-      this.currentPlayer = this.firstPlayer;
+      //choose current player for UI
+      this.player = this.creator;
 
-      //get secondPlayer
+      //get visitor
       socketService.on('join game',data=>{
         this.playerJoined = true;
-        //create new secondPlayer
-        this.secondPlayer = new Player({
+        //create new visitor
+        this.visitor = new Player({
           game: query.gamename,
           name: data.username,
           action: 'O'
@@ -62,7 +87,7 @@ export default {
       //send creator to  visitor ui
       socketService.on('get creator',data=>{
         socketService.emit('send creator',{
-          username: this.firstPlayer.name
+          username: this.creator.name
         })
       });
 
@@ -71,25 +96,25 @@ export default {
     // 
   	} else if(query.state === 'visitor'){
       this.playerJoined = true;
-      //create new secondPlayer
-  		this.secondPlayer = new Player({
+      //create new visitor
+  		this.visitor = new Player({
         game: query.gamename,
   			name: query.username,
   			action: 'O'
   		});
       //make current ui player
-      this.currentPlayer = this.secondPlayer;
+      this.player = this.visitor;
 
       //tell creator about joining
       socketService.emit('join room',{
-        username: this.secondPlayer.name,
+        username: this.visitor.name,
         room: query.gamename
       })
       //get second player
       socketService.emit('get creator','');
       socketService.on('send creator',data=>{
-      //create new firstPlayer
-        this.firstPlayer = new Player({
+      //create new creator
+        this.creator = new Player({
           game: query.gamename,
           name: data.username,
           action:'X'
@@ -102,6 +127,19 @@ export default {
       //pretent to break ui
       window.location = '/';
     }
+    /**
+    /*
+    /*Listen to wins
+    /*
+    */
+    socketService.on('player win',(data)=>{
+      if(data.action === this.creator.action){
+         this.creator.win();
+      } 
+      if(data.action === this.visitor.action){
+         this.visitor.win();
+      } 
+    })
   }
 };
 </script>
@@ -109,6 +147,7 @@ export default {
 <style lang="sass">
 @import '../../../variables'; 
 #game-play {
+  user-select: none;
 	@media screen and(min-width: 1400px){
 		margin-top: -3%;
 	}
@@ -119,7 +158,7 @@ export default {
 	.chat-section,
 	.game-section{
 		background: white;
-		border: 1px solid grey;
+		border: .5px solid grey;
 		margin: 10px;
 		h2 {
 			font-weight: normal;
@@ -131,8 +170,33 @@ export default {
 		flex: 3;
 	}
 	.game-section {
+    height: 100%;
 		min-width: 500px;
 		flex:6;
+    .main-message {
+      font-size: 2rem;
+      text-align: center;
+      @include center-page-container(100%);
+    }
+    .game-info{
+      cursor: default;
+      font-size: 2rem;
+      text-align: center;
+      .player-right {
+        float: right;
+        color: lighten(darkred,10%); 
+        margin: 20px;
+      }
+      .player-left {
+        float: left;
+        color: lighten($brand-bg,30%); 
+        margin: 20px;
+      }
+      .player-wins {
+        font-size: 4rem;
+        padding-top: 200%;
+      }
+    }
 	}
 }
 </style>

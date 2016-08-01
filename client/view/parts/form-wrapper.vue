@@ -15,9 +15,10 @@ export default {
 </script>
 
 <style lang="sass">
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
 @import '../variables';
 #form-wrapper {
-	transform: translateX(-10%);
+	//transform: translateX(-10%);
 	max-width: 60%;
 	margin: 0 auto;
 	padding: 50px;
@@ -35,6 +36,7 @@ export default {
 				transform: translateX(-15%);
 			}
 			input{
+				font-family: "Roboto", sans-serif;
 				padding: 10px;
 				height: 100px;
 				text-align: inherit;

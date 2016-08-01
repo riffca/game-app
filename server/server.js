@@ -6,15 +6,31 @@ let express = require('express');
 let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
-//let uuid = require('node-uuid');
+
 /**
 /*
 /*Socket Config
 /*
 */
+//
+
+//custom socket rooms
 let socketRooms = [];
 
+class Room {
+    constructor(options) {
+        this.name = options.name;
+        this.creator = options.creator;
+        this.visitor = '';
+    }
+    setVisitor(visitor) {
+        this.visitor = visitor;
+    }
+}
+
+
 io.on('connection', socket => {
+
     //on connetction send to client socketId 
 
     socket.emit('get user id', socket.id);
@@ -23,10 +39,19 @@ io.on('connection', socket => {
     //on disconnect delete room from array if it exists
 
     socket.on('disconnect', () => {
+        /**
+        /*working with custom socket rooms
+        */
         socketRooms.forEach(room => {
+            if (room.visitor === socket.id) {
+                socket.leave(room.name);
+                socket.emit('visitor leave room', {room: room.name});
+            }
+
             if (room.creator === socket.id) {
+                socket.leave(room.name);
                 socketRooms.splice(socketRooms.indexOf(room), 1);
-                console.log(socketRooms);
+                socket.emit('room deleted', {room: room.name});
             }
         });
         console.log('%s\n%s:%j', 'user disconnected', 'socketRooms', socketRooms);
@@ -35,30 +60,56 @@ io.on('connection', socket => {
     //create room
 
     socket.on('create room', data => {
-        socketRooms.push(data.room);
+        /**
+        /*working with custom socket rooms
+        */
+        socketRooms.push(new Room(data.room));
+
         socket.join(data.room.name);
-        io.emit('room created', { 
+        io.emit('room created', {
             message: 'room sucessfully created'
         });
         console.log('%s:%j', 'socketRooms', socketRooms);
     });
 
- 
-    //Get gamePlay users
 
-    socket.on('join room',data=>{
+    //Get gamePlay users
+    socket.on('join room', data => {
+        /**
+        /*working with custom socket rooms
+        */
+        socketRooms.forEach(room=>{
+            if(room.name === data.room) {
+                room.setVisitor(socket.id);
+            }
+        });
+
+        console.log(socketRooms);
         socket.join(data.room);
-        io.emit('join game',{
+        io.emit('join game', {
             username: data.username
         });
+
     });
 
-    socket.on('get creator',data=>{
+    //Leave room
+    socket.on('leave room', data=>{
+        socket.leave(data.room);
+        if(data.state === 'creator'){
+
+            io.emit('creator leave');
+        }
+        if(data.state === 'visitor'){
+            io.emit('visitor leave');
+        }
+    });
+
+    socket.on('get creator', data => {
         io.emit('get creator');
     });
 
-    socket.on('send creator',data=>{
-        io.emit('send creator',{
+    socket.on('send creator', data => {
+        io.emit('send creator', {
             username: data.username
         });
     });
@@ -72,6 +123,10 @@ io.on('connection', socket => {
             index: data.index,
             parentIndex: data.parentIndex
         });
+    });
+
+    socket.on('player win', data =>{
+        socket.broadcast.to(data.room).emit('player win',data);
     });
 
     //chat messages
@@ -129,26 +184,33 @@ if (process.env.NODE_ENV === config.NODE_ENV) {
 app.post('/api/game/create', (req, res) => {
     //check if room exists
     let roomExists;
+    /**
+    /*working with custom socket rooms
+    */
     socketRooms.forEach(room => {
-         if (room.name === req.body.room.name) {
-             roomExists = true;
-         }
+        if (room.name === req.body.room.name) {
+            roomExists = true;
+        }
         console.log(room);
     });
-    if(roomExists){
+    if (roomExists) {
         res.send({
             success: false,
             message: 'please choose another game name'
         });
         return;
-    } 
+    }
+
     res.send({
         success: true,
-         message: 'correct game name'
-    });  
+        message: 'correct game name'
+    });
 });
 
 app.get('/api/game/join', (req, res) => {
+    /**
+    /*working with custom socket rooms
+    */
     if (!socketRooms.length) {
         res.send('No games');
         return;

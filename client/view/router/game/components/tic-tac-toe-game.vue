@@ -1,6 +1,7 @@
 <template>
 <div id="tic-tac-toe-game">
-	<div class="playground-row"v-for="row in playground">
+	<h3 class="message" v-if="message">{{ message }}</h3>
+	<div class="playground-row" v-for="row in playground">
 		<div class="playground-item"
 					@click="makeAction($index,$parent.$index)" 
 					v-for="square in row">
@@ -11,15 +12,19 @@
 </template>
 
 <script>
-
+/**
+/*
+/*T I C  T A C  T O E  G A M E
+/*
+*/
 import socketService from 'service/socket';
 
 export default {
-  components:{},
+  props: ['player'],
   data () {
     return {
-    	room: this.$parent.currentPlayer.game,
-    	action: this.$parent.currentPlayer.action,
+    	message:'',
+    	userTurn: false,
     	playground: [
 	      [
 	        {id: 0, content: ''},
@@ -36,40 +41,133 @@ export default {
 	        {id: 7, content: ''}, 
 	        {id: 8, content: ''}
 	      ]
-       ]
+       ],
+       winPoints() {
+	     let playground = this.playground;
+	     let points = [
+	       [playground[0][0], playground[0][1], playground[0][2]],
+	       [playground[1][0], playground[1][1], playground[1][2]],
+	       [playground[2][0], playground[2][1], playground[2][2]],
+	       [playground[0][0], playground[1][0], playground[2][0]],
+	       [playground[0][1], playground[1][1], playground[2][1]],
+	       [playground[0][2], playground[1][2], playground[2][2]],
+	       [playground[0][0], playground[1][1], playground[2][2]],
+	       [playground[0][2], playground[1][1], playground[2][0]]
+	     ];
+	     return points;
+   	   }
   	}
   },
   methods:{
+  	newGame(){
+  		this.playground.forEach(item=>{
+  			item.forEach(square=>{
+  				square.content = '';
+  			})
+  		});
+
+  		if(this.player.action !== 'X'){
+  			this.userTurn = false;
+  		} else {
+  			this.userTurn = true;
+  		}
+  	},
+  	checkWinner(action){
+  		let victory;
+  		this.winPoints().forEach(points=>{
+	  		if(checkPlayground(points)){
+	  			victory = points;
+	  		}	
+  		});
+  		//if there is win combination
+  		if(victory){
+  		 	this.message = action + ' wins';
+  		 	alertTime(()=>{
+  		 		this.newGame();
+  		 		this.message = '';
+  		 	});
+  		 	socketService.emit('player win',{action: action, room: this.player.game});
+  		}
+  	},
+  	//check is square empty
+  	isEmpty(square){
+  		if(square.content === ''){
+  			return true;
+  		} else {
+  			return false;
+  		}
+  	},
+  	//make action
   	makeAction(index,parentIndex){
   		//find square
   		let square = this.playground[parentIndex][index];
-  		square.content = this.action;
-  		//send to another user action options
-  		socketService.emit('game action',{
-  			room: this.room,
-  			action: this.action,
-  			index: index,
-  			parentIndex: parentIndex
-  		});
+  		if(this.userTurn){
+  			if(this.isEmpty(square)){
+		  		//send to all room users action options
+			  	socketService.emit('game action',{
+			  		room: this.player.game,
+			  		action: this.player.action,
+			  		index: index,
+			  		parentIndex: parentIndex
+			  	});
+  			} else {
+  				this.message = 'This square is not empty';
+  				alertTime(()=>this.message = '');
+  			}
+  		} else {
+  			this.message = 'This is not your turn';
+  			alertTime(()=>this.message = '');
+  		}
   	}
   },
   created(){
-  	//listen to actions
+  	//make creator to make first game action
+  	if(this.player.action === 'X'){
+  		this.userTurn = true;
+  	}
+  	//listen to socket actions
   	socketService.on('action done',data=>{
   		let square = this.playground[data.parentIndex][data.index];
   		square.content = data.action;
+
+  		//check who is winner
+  		this.checkWinner(data.action);
+
+  		//enable or disable user to make game action
+  		if(data.action === this.player.action){
+  			this.userTurn = false;
+  		} else {
+  			this.userTurn = true;
+  		}
   	});
   }
 };
+
+/**
+/*help functions
+*/
+//find victory point
+function checkPlayground(arr) {
+  let i = arr[0].content;
+  return i != "" && i == arr[1].content && i == arr[2].content;
+};
+function alertTime(func){
+	setTimeout(func,3000);
+}
 </script>
 
 <style lang="sass">
 
 #tic-tac-toe-game{
+	padding-top:50px;
 	cursor: pointer;
 	user-select: none;
 	margin: 0 auto;
 	display: table;
+	.message {
+		text-align: center;
+		color: lighten(red,30%);
+	}
 	.playground-row {
 		display: table-row;
 		.playground-item{
