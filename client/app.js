@@ -37,7 +37,7 @@ Vue.http.interceptors.push(interceptors);
 */
 let rootComponent = Vue.extend(require('root/root.vue'));
 let router = new vueRouter({
-    history: false
+    history: NODE_ENV === 'development' ? false : true
 });
 import routeMap from 'view/router';
 router

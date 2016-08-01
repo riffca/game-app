@@ -20,7 +20,7 @@ export default {
 	height: inherit;
 	@include center-page-container(90%);
 	padding-top:8%;
-	@media screen and(max-width: 700px){
+	@media screen and(max-width: 830px){
 		padding-top:20%;
 		width: 100%;
 	}

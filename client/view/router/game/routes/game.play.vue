@@ -200,7 +200,7 @@ export default {
       }
       .player-wins {
         font-size: 4rem;
-        padding-top: 200%;
+        padding-top: 200px;
       }
     }
 	}
