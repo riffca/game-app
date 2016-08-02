@@ -2,7 +2,8 @@ const
     webpack = require('webpack'),
     path = require('path'),
     ExtractTextPlugin = require('extract-text-webpack-plugin'),
-    BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+    precss = require('precss'),
+    autoprefixer = require('autoprefixer');
 
 
 //E N V
@@ -66,6 +67,9 @@ module.exports = {
             test: /\.vue$/,
             loader: 'vue'
         }]
+    },
+    postcss:function(){
+        return [precss, autoprefixer];
     },
 
     vue: {
