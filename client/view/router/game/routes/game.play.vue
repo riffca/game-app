@@ -175,6 +175,10 @@ export default {
 		flex: 3;
 	}
 	.game-section {
+    @media screen and(max-width: 499px){
+      min-width: 400px;
+      max-height: 400px;
+    }
     min-width: 500px;
     height: 100%;
 		flex:6;
@@ -185,16 +189,19 @@ export default {
       text-align: center;
     }
     .game-info{
+      position: relative;
       cursor: default;
       font-size: 2rem;
       text-align: center;
       .player-right {
+        max-width: 50px;
         float: right;
         color: lighten(darkred,10%); 
         margin: 20px;
       }
       .player-left {
-        float: left;
+        max-width: 50px;
+        float:left;
         color: lighten($brand-bg,30%); 
         margin: 20px;
       }

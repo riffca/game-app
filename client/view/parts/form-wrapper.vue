@@ -18,11 +18,18 @@ export default {
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 @import '../variables';
 #form-wrapper {
-	//transform: translateX(-10%);
+	@media screen and(max-width: 550px){
+		max-width: 100%;
+		margin:0;
+		padding:0;
+	}
 	max-width: 60%;
 	margin: 0 auto;
 	padding: 50px;
 	form {
+		@media screen and(max-width: 430px){
+			margin:0 auto;
+		}
 		max-width: 300px;
 		margin: inherit;
 		.input-control{
@@ -34,8 +41,16 @@ export default {
 				font-size: 1.8rem;
 				padding: 20px;
 				transform: translateX(-15%);
+				@media screen and(max-width: 430px){
+					transform: translateX(0);
+				}
 			}
 			input{
+				@media screen and(max-width: 430px){
+					height:50px;
+					font-size:1.2rem;
+					width: 100%;
+				}
 				font-family: "Roboto", sans-serif;
 				padding: 10px;
 				height: 100px;

@@ -26,10 +26,18 @@ export default {
             }
         }
     },
-    //not found
+    //not found page
     '*': {
         component: {
-            template: `<h1>Page not found</h1>`
+            template: `
+            <style>
+            .not-found { 
+                position: relative; 
+                top:50%; 
+                taransform:translateY(-50%);
+            }
+            </style>
+            <h1 class="not-found">Page not found</h1>`
         }
     },
 };

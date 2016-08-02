@@ -24,7 +24,7 @@ export default {
   	})
     if(this.$route.query.gamename){
       this.$route.router.go({name: 'index'});
-    }
+    } 
   }
 };
 </script>
