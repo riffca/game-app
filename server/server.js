@@ -12,7 +12,7 @@ let io = require('socket.io')(http);
 /*L O G G I N G
 */
 
-process.env.NODE_ENV = 'development';
+let develop = process.env.NODE_ENV || 'development';
 
 if (process.env.NODE_ENV === 'development') {
     //Logging
