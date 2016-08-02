@@ -43,13 +43,11 @@ class SocketLogic {
             socket.on('create room', data => {
 
                 this.rooms.push(new Room(data.room));
-
                 socket.join(data.room.name);
+
                 Promise.resolve()
                     .then(() => {
-                        io.emit('room created', {
-                            message: 'room sucessfully created'
-                        });
+                        io.emit('room created');
 
                     }).then(() => {
                         //update view with rooms
@@ -141,7 +139,7 @@ class SocketLogic {
                             io.emit('delete chat messages');
 
                         }).then(() => {
-                        	
+
                             //update view with rooms list
                             this.UpdateFreeRoomsList(room);
 
@@ -155,9 +153,7 @@ class SocketLogic {
 
                     Promise.resolve()
                         .then(() => {
-
                             io.emit('creator disconnected');
-
                         }).then(() => {
                             //update view with visitor gameplay
                             this.UpdateFreeRoomsList();
@@ -171,6 +167,7 @@ class SocketLogic {
         }
         //search room without visitor
     filterRooms(vistorLeaveRoom) {
+    	//make foom free for new player
         if (vistorLeaveRoom) {
             vistorLeaveRoom.visitor = '';
         }

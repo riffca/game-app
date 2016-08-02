@@ -8,6 +8,40 @@ let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
+/*
+/*L O G G I N G
+*/
+
+process.env.NODE_ENV = 'development';
+
+if (process.env.NODE_ENV === 'development') {
+    //Logging
+    let debug = require('debug')('http');
+    let interceptor = require('express-interceptor');
+    let finalInterceptor = interceptor((req, res) => {
+        return {
+            isInterceptable() {
+                debug(req.method + ' ' + req.url);
+                debug({ data: req.body });
+            },
+            intercept(body, send) {}
+        };
+    });
+    app.use(finalInterceptor);
+
+    //Webpack
+    const webpack = require('webpack');
+    const webpackConfig = require('../webpack.config');
+    const compiler = webpack(webpackConfig);
+
+    app.use(require('webpack-dev-middleware')(compiler, {
+        noInfo: true,
+        publicPath: webpackConfig.output.publicPath,
+    }));
+    app.use(require('webpack-hot-middleware')(compiler));
+}
+
+
 /**
 /*
 /*Socket Config
@@ -75,39 +109,6 @@ app.get('*', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-
-/*
-/*L O G G I N G
-*/
-
-process.env.NODE_ENV = 'development';
-
-if (process.env.NODE_ENV !== 'development') {
-    //Logging
-    let debug = require('debug')('http');
-    let interceptor = require('express-interceptor');
-    let finalInterceptor = interceptor((req, res) => {
-        return {
-            isInterceptable() {
-                debug(req.method + ' ' + req.url);
-                debug({ data: req.body });
-            },
-            intercept(body, send) {}
-        };
-    });
-    app.use(finalInterceptor);
-
-    //Webpack
-    const webpack = require('webpack');
-    const webpackConfig = require('../webpack.config');
-    const compiler = webpack(webpackConfig);
-
-    app.use(require('webpack-dev-middleware')(compiler, {
-        noInfo: true,
-        publicPath: webpackConfig.output.publicPath,
-    }));
-    app.use(require('webpack-hot-middleware')(compiler));
-}
 
 /*
 /*S T A R T  S E R V E R

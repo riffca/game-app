@@ -15,10 +15,10 @@
 			<label for="username">Your nickname:</label>
 			<input type="text" 
              id="username" 
-             v-model="username" 
+             v-model="username"
+             required
              placeholder="Enter user name"
-             autocomplete="off" 
-             required>
+             autocomplete="off" >
 		</div>
 		<button type="submit">Play</button>
 	</form>
