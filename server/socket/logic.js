@@ -14,146 +14,170 @@ class Room {
 
 class SocketLogic {
 
-	constructor(io){
-		/**
-		/*working with custom socket rooms
-		*/
-		this.rooms = [];
-		this.io = io;
-	}
+    constructor(io) {
+        /**
+        /*working with custom socket rooms
+        */
+        this.rooms = [];
+        this.io = io;
+    }
 
-	start(){
-		let io = this.io;
-		io.on('connection', socket => {
-		    //on connection send to client socketId 
-		    socket.emit('get user id', socket.id);
+    start() {
+        let io = this.io;
+        io.on('connection', socket => {
+            //on connection send to client socketId 
+            socket.emit('get user id', socket.id);
 
-		    //on disconnect delete room from array if it exists
-		    socket.on('disconnect', () => {
-		        this.leaveRoomLogic(socket);
-		        console.log('%s\n%s:%j', 'user disconnected', 'rooms', this.rooms);
-		    });
+            //on creator disconnect delete room from array if it exists
+            socket.on('disconnect', () => {
+                this.leaveRoomLogic(socket);
+                console.log('%s\n%s:%j', 'user disconnected', 'rooms', this.rooms);
+            });
 
-		    //Leave room
-		    socket.on('leave room', () => {
-		        this.leaveRoomLogic(socket);
-		    });
+            //Leave room
+            socket.on('leave room', () => {
+                this.leaveRoomLogic(socket);
+            });
 
-		    //create room
-		    socket.on('create room', data => {
+            //create room
+            socket.on('create room', data => {
 
-		        this.rooms.push(new Room(data.room));
+                this.rooms.push(new Room(data.room));
 
-		        socket.join(data.room.name);
-		        io.emit('room created', {
-		            message: 'room sucessfully created'
-		        });
+                socket.join(data.room.name);
+                Promise.resolve()
+                    .then(() => {
+                        io.emit('room created', {
+                            message: 'room sucessfully created'
+                        });
 
-		        //update view with rooms
-		        io.emit('new rooms',this.rooms);
+                    }).then(() => {
+                        //update view with rooms
+                        this.UpdateFreeRoomsList();
+                    });
+            });
 
-		    });
-		    //Get gamePlay users
+            //Get gamePlay users
 
-		    socket.on('join room', data => {
-		        /**
-		        /*working with custom socket rooms
-		        */
-		        this.rooms.forEach(room => {
-		            if (room.name === data.room) {
-		                room.setVisitor(socket.id);
-		            }
-		        });
+            socket.on('join room', data => {
+            	//set visitor to room
+                this.rooms.forEach(room => {
+                    if (room.name === data.room) {
+                        room.setVisitor(socket.id);
+                    }
+                });
 
-		        socket.join(data.room);
-		        io.emit('join game', {
-		            username: data.username
-		        });
-		        io.emit('new rooms',this.filterRooms());
+                socket.join(data.room);
 
-		    });
+                Promise.resolve()
+                    .then(() => {
+                    	//notice creator about joining visitor
+                        socket.broadcast.to(data.room).emit('join game', {
+                            username: data.username
+                        });
+                    }).then(() => {
+                        this.UpdateFreeRoomsList();
+                    });
 
-		    socket.on('get creator', data => {
-		        io.emit('get creator');
-		    });
+            });
 
-		    socket.on('send creator', data => {
-		        io.emit('send creator', {
-		            username: data.username
-		        });
-		    });
+            socket.on('get creator', data => {
+                io.emit('get creator');
+            });
+
+            socket.on('send creator', data => {
+                io.emit('send creator', {
+                    username: data.username
+                });
+            });
 
 
-	    	//game actions
-		    socket.on('game action', data => {
-		        io.to(data.room).emit('action done', {
-		            action: data.action,
-		            index: data.index,
-		            parentIndex: data.parentIndex
-		        });
-		    });
+            //game actions
+            socket.on('game action', data => {
+                io.to(data.room).emit('action done', {
+                    action: data.action,
+                    index: data.index,
+                    parentIndex: data.parentIndex
+                });
+            });
 
-		    socket.on('player win', data => {
-		        socket.broadcast.to(data.room).emit('player win', data);
-		    });
+            socket.on('player win', data => {
+                socket.broadcast.to(data.room).emit('player win', data);
+            });
 
-		    //chat messages
-		    socket.on('write message', data => {
-		        io.to(data.room).emit('get message', {
-		            text: data.text,
-		            username: data.username,
-		            css: data.css
-		        });
-		    });
+            //chat messages
+            socket.on('write message', data => {
+                io.to(data.room).emit('get message', {
+                    text: data.text,
+                    username: data.username,
+                    css: data.css
+                });
+            });
 
-		});
+        });
 
-	}
+    }
 
-	//leave room logic
-	leaveRoomLogic(socket) {
-		//need to fix logic with visitor not
-		let rooms = this.rooms;
-		let io = this.io;
+    //leave room logic
+    leaveRoomLogic(socket) {
+            //need to fix logic with visitor not
+            let rooms = this.rooms;
+            let io = this.io;
 
-		if(!rooms.length) return;
+            if (!rooms.length) return;
 
-	    rooms.forEach(room => {
+            rooms.forEach(room => {
 
-	        if (room.visitor === socket.id) {
-	            socket.leave(room.name);
-	            //update view with creator gameplay
-	            io.emit('visitor disconnected');
-	            //update view with chat messages
-	            io.emit('delete chat messages');
-	            //update view with rooms list
-	            this.UpdateFreeRoomsList(room);
-	        }
-	        if (room.creator === socket.id) {
+                if (room.visitor === socket.id) {
+                    socket.leave(room.name);
 
-	            socket.leave(room.name);
-	            rooms.splice(rooms.indexOf(room), 1);
-	            //update view with visitor gameplay
-	            io.emit('creator disconnected');
+                    Promise.resolve()
+                        .then(() => {
+                            //update view with creator gameplay
+                            io.emit('visitor disconnected');
+                        }).then(() => {
 
-	            this.UpdateFreeRoomsList();
+                            //update view with chat messages
+                            io.emit('delete chat messages');
 
-	        }
-	    });
-	}
-	//update view with free rooms
-	UpdateFreeRoomsList(visitorRoom){
-		 this.io.emit('new rooms',this.filterRooms(visitorRoom));
-	}
-	//search room without visitor
-	filterRooms(vistorLeaveRoom){
-	    if(vistorLeaveRoom){
-	        vistorLeaveRoom.visitor = '';
-	    }
-	    return this.rooms.filter(room=>{
-	        return room.visitor === '';
-	    });
-	}
+                        }).then(() => {
+                        	
+                            //update view with rooms list
+                            this.UpdateFreeRoomsList(room);
+
+                        });
+
+                }
+                if (room.creator === socket.id) {
+
+                    socket.leave(room.name);
+                    rooms.splice(rooms.indexOf(room), 1);
+
+                    Promise.resolve()
+                        .then(() => {
+
+                            io.emit('creator disconnected');
+
+                        }).then(() => {
+                            //update view with visitor gameplay
+                            this.UpdateFreeRoomsList();
+                        });
+                }
+            });
+        }
+        //update view with free rooms
+    UpdateFreeRoomsList(visitorRoom) {
+            this.io.emit('new rooms', this.filterRooms(visitorRoom));
+        }
+        //search room without visitor
+    filterRooms(vistorLeaveRoom) {
+        if (vistorLeaveRoom) {
+            vistorLeaveRoom.visitor = '';
+        }
+        return this.rooms.filter(room => {
+            return room.visitor === '';
+        });
+    }
 }
 
 module.exports = SocketLogic;

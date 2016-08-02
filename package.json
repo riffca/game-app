@@ -18,7 +18,7 @@
     "devhistory": "webpack-dev-server --inline --hot --history-api-fallback",
     "build": "SET NODE_ENV=production && webpack",
     "linuxstart": "NODE_ENV=production node server/server.js",
-    "linuxiodebug": "DEBUG=socket.io:socket node server/server.js"
+    "linuxiodebug": "NODE_ENV=production DEBUG=socket.io:socket node server/server.js"
   },
   "keywords": [],
   "author": "riffca",

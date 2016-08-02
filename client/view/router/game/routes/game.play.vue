@@ -194,13 +194,13 @@ export default {
       font-size: 2rem;
       text-align: center;
       .player-right {
-        max-width: 50px;
+        max-width: 100px;
         float: right;
         color: lighten(darkred,10%); 
         margin: 20px;
       }
       .player-left {
-        max-width: 50px;
+        max-width: 100px;
         float:left;
         color: lighten($brand-bg,30%); 
         margin: 20px;

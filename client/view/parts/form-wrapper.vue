@@ -27,7 +27,7 @@ export default {
 	margin: 0 auto;
 	padding: 50px;
 	form {
-		@media screen and(max-width: 430px){
+		@media screen and(max-width: 550px){
 			margin:0 auto;
 		}
 		max-width: 300px;
@@ -41,12 +41,12 @@ export default {
 				font-size: 1.8rem;
 				padding: 20px;
 				transform: translateX(-15%);
-				@media screen and(max-width: 430px){
+				@media screen and(max-width: 550px){
 					transform: translateX(0);
 				}
 			}
 			input{
-				@media screen and(max-width: 430px){
+				@media screen and(max-width: 550px){
 					height:50px;
 					font-size:1.2rem;
 					width: 100%;
