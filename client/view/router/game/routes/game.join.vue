@@ -22,7 +22,7 @@
 					   autocomplete="off"
 					   placeholder="Enter your nickname">
 			</div>
-			<button type="submit">Play</button>
+			<button type="submit" disabled="{{disableButton}}">Play</button>
 		</form>
 	</form-wrapper>
 </div>
@@ -39,6 +39,7 @@ export default {
   components: {formWrapper},
   data () {
     return {
+    	disableButton: false,
     	anyGames: false,
     	selectedGame: '',
     	username: '',
@@ -59,7 +60,7 @@ export default {
   		resolve({
   			games: res.data
   		})
-  	});
+  	},()=>{alert('Server error')});
   },
   methods:{
  	joinGame(){
@@ -68,6 +69,7 @@ export default {
   				alert('Choose game');
   				return;
   			}
+  			this.disableButton = true;
   			this.$route.router.go({
   				name: 'gamePlay',
   				query:{

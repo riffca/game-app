@@ -45,19 +45,14 @@ class SocketLogic {
                 this.rooms.push(new Room(data.room));
                 socket.join(data.room.name);
 
-                Promise.resolve()
-                    .then(() => {
-                        io.emit('room created');
-
-                    }).then(() => {
-                        //update view with rooms
-                        this.UpdateFreeRoomsList();
-                    });
+                //update view with rooms
+                this.UpdateFreeRoomsList();
+                
             });
 
             //Get gamePlay users
 
-            socket.on('join room', data => {
+            socket.on('join game', data => {
             	//set visitor to room
                 this.rooms.forEach(room => {
                     if (room.name === data.room) {
@@ -71,7 +66,8 @@ class SocketLogic {
                     .then(() => {
                     	//notice creator about joining visitor
                         socket.broadcast.to(data.room).emit('join game', {
-                            username: data.username
+                            username: data.username,
+                            room: data.room
                         });
                     }).then(() => {
                         this.UpdateFreeRoomsList();
@@ -80,15 +76,11 @@ class SocketLogic {
             });
 
             socket.on('get creator', data => {
-                io.emit('get creator');
-            });
-
-            socket.on('send creator', data => {
-                io.emit('send creator', {
-                    username: data.username
+                socket.broadcast.to(data.room).emit('get creator', {
+                    username: data.username,
+                    room: data.room
                 });
             });
-
 
             //game actions
             socket.on('game action', data => {
@@ -150,7 +142,7 @@ class SocketLogic {
 
                     socket.leave(room.name);
                     rooms.splice(rooms.indexOf(room), 1);
-
+              
                     Promise.resolve()
                         .then(() => {
                             io.emit('creator disconnected');

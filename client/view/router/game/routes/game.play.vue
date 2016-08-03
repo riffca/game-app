@@ -53,7 +53,7 @@ export default {
       player: {},
       //current player
       creator: {},
-      visitor: {},
+      visitor: {}
   	}
   },
   created(){
@@ -68,6 +68,7 @@ export default {
     //if game creator
     //
   	if(query.state === 'creator'){
+
       //create new creator
   		this.creator = new Player({
         game: query.gamename,
@@ -78,20 +79,20 @@ export default {
       //choose current player for UI
       this.player = this.creator;
 
+      //then waiting
+
       //get visitor
       socketService.on('join game',data=>{
         this.playerJoined = true;
         //create new visitor
         this.visitor = new Player({
-          game: query.gamename,
+          game: data.room,
           name: data.username,
           action: 'O'
         });
-      });
-
-      //send creator to  visitor ui
-      socketService.on('get creator',data=>{
-        socketService.emit('send creator',{
+        //send creator to  visitor ui
+        socketService.emit('get creator',{
+          room: this.creator.game,
           username: this.creator.name
         })
       });
@@ -100,6 +101,7 @@ export default {
     //if game visitor
     // 
   	} else if(query.state === 'visitor'){
+
       this.playerJoined = true;
       //create new visitor
   		this.visitor = new Player({
@@ -111,16 +113,16 @@ export default {
       this.player = this.visitor;
 
       //tell creator about joining
-      socketService.emit('join room',{
-        username: this.visitor.name,
-        room: query.gamename
+      socketService.emit('join game',{
+        username: this.player.name,
+        room: this.player.game
       })
+
       //get second player
-      socketService.emit('get creator','');
-      socketService.on('send creator',data=>{
+      socketService.on('get creator',data=>{
       //create new creator
         this.creator = new Player({
-          game: query.gamename,
+          game: data.room,
           name: data.username,
           action:'X'
         })

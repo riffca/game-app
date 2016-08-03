@@ -169,25 +169,28 @@ export default {
   	});
 
     socketService.on('creator disconnected', ()=>{
-        this.message = this.player.name + ' leave game!';
-
-        alertTime(()=>{
-          //socketService.emit('leave room');
-          this.$route.router.go({name: 'index'});  
-        })
+        //logic for inner root navigation links
+        if(this.$route.query.state === 'visitor'){
+          this.message = this.player.name + ' leave game!';
+          alertTime(()=>{
+            //socketService.emit('leave room');
+            this.$route.router.go({name: 'index'});  
+          })
+        }
 
     });
 
     socketService.on('visitor disconnected', ()=>{
-        this.message = this.player.name + ' leave game!';
-
-        alertTime(()=>{
-          this.$parent.playerJoined = false;
-          this.player.wins = 0;
-          this.message = '';
-          this.newGame();
-        })
-
+      //logic for inner root navigation links
+        if(this.$route.query.state === 'creator'){
+          this.message = this.player.name + ' leave game!';
+          alertTime(()=>{
+            this.$parent.playerJoined = false;
+            this.player.wins = 0;
+            this.message = '';
+            this.newGame();
+          })
+        }
     });
   }
 };

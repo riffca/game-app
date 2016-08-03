@@ -61,12 +61,6 @@ export default {
             creator: this.$root.playerSocketId
           }
         })
-      });
-  	}
-  },
-  created(){
-    //listen socket events
-    socketService.on('room created',data=>{
         this.$route.router.go({
           name: 'gamePlay',
           query:{
@@ -75,7 +69,8 @@ export default {
             username: this.username
           }
         }); 
-    })    
+      })
+  	}
   }
 };
 </script>
